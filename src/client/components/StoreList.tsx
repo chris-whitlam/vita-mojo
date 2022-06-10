@@ -11,7 +11,7 @@ const StyledSpace = styled(Space)`
 `;
 
 export default function () {
-  const [{ data: stores, error }, loadMore] = useLoadStores()
+  const [{ data: { stores, hasMoreToLoad }, error }, loadMore] = useLoadStores();
 
   if (!stores?.length || error) {
     return null;
@@ -22,7 +22,7 @@ export default function () {
       <InfiniteScroll
         dataLength={stores.length}
         next={loadMore}
-        hasMore={true}
+        hasMore={hasMoreToLoad}
         loader={<h4>Loading...</h4>}
       >
         {stores.map(store => <StoreCard key={store.uuid} {...store} />)}

@@ -1,6 +1,6 @@
-export interface FetchState {
+export interface FetchState<T> {
   loading: boolean;
-  data: any;
+  data: T;
   error: any;
 }
 
@@ -9,10 +9,10 @@ export interface FetchOptions {
   queryParams: any;
 }
 
-export type FetchHookCallback = (
+export type FetchHookCallback<T> = (
   options?: Omit<FetchOptions, 'url'>,
-) => Promise<FetchState>;
+) => Promise<FetchState<T>>;
 
-export type FetchHookReturnValue = [FetchState, FetchHookCallback];
+export type FetchHookReturnValue<T> = [FetchState<T>, FetchHookCallback<T>];
 
-export type FetchHook = (options?: FetchOptions) => FetchHookReturnValue;
+export type FetchHook<T> = (options?: FetchOptions) => FetchHookReturnValue<T>;

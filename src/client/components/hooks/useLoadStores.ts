@@ -3,8 +3,14 @@ import useFetch from './useFetch';
 
 import { FetchHook, FetchHookCallback } from './types';
 
-const useLoadStores: FetchHook = () => {
+interface StoresState {
+  stores: any;
+  hasMoreToLoad: boolean;
+}
+
+const useLoadStores: FetchHook<StoresState> = () => {
   const [offset, setOffset] = useState(0);
+  const [hasMoreToLoad, setHasMoreToLoad] = useState(true);
   const [stores, setStores] = useState([]);
 
   const [{ loading, error }, loadStores] = useFetch({
@@ -14,22 +20,24 @@ const useLoadStores: FetchHook = () => {
     },
   });
 
-  const loadMoreStores: FetchHookCallback = useCallback(async () => {
-    const { data: newData } = await loadStores({
-      queryParams: { offset, limit: 30 },
-    });
+  const loadMoreStores: FetchHookCallback<StoresState> =
+    useCallback(async () => {
+      const { data: newStores } = await loadStores({
+        queryParams: { offset, limit: 30 },
+      });
 
-    setOffset((currentOffset) => currentOffset + newData.length);
-    setStores((currentStores) => [...currentStores, ...newData]);
+      setHasMoreToLoad(!!newStores.length);
+      setOffset((currentOffset) => currentOffset + newStores.length);
+      setStores((currentStores) => [...currentStores, ...newStores]);
 
-    return { loading, data: newData, error };
-  }, [offset]);
+      return { loading, data: { stores, hasMoreToLoad }, error };
+    }, [offset]);
 
   useEffect(() => {
     loadMoreStores();
   }, []);
 
-  return [{ loading, data: stores, error }, loadMoreStores];
+  return [{ loading, data: { stores, hasMoreToLoad }, error }, loadMoreStores];
 };
 
 export default useLoadStores;

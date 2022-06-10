@@ -3,8 +3,8 @@ import axios from 'axios';
 
 import { FetchHook, FetchOptions, FetchState } from './types';
 
-const useFetch: FetchHook = ({ url, queryParams = {} }: FetchOptions) => {
-  const [state, setState] = useState<FetchState>({
+const useFetch: FetchHook<any> = ({ url, queryParams = {} }: FetchOptions) => {
+  const [state, setState] = useState<FetchState<any>>({
     loading: false,
     data: undefined,
     error: undefined,
