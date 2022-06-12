@@ -8,6 +8,35 @@ export type DownloadHook<T> = (
   options?: FetchOptions,
 ) => FetchHookReturnValue<T>;
 
+const handleDownload = async (
+  url: string,
+  filename: string,
+  contentType = 'text/csv',
+) => {
+  const result = await axios.get(url, {
+    headers: {
+      Accept: contentType,
+    },
+  });
+
+  const blob = new Blob([result.data], {
+    type: `${contentType};charset=utf-8;`,
+  });
+
+  const link = document.createElement('a');
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  return result.data;
+};
+
 const useDownload: DownloadHook<any> = (
   filename: string,
   { url }: FetchOptions,
@@ -19,35 +48,18 @@ const useDownload: DownloadHook<any> = (
   });
 
   const callback = async () => {
+    setState({
+      loading: true,
+      data: undefined,
+      error: undefined,
+    });
+
     try {
-      setState({
-        loading: true,
-        data: undefined,
-        error: undefined,
-      });
-
-      const result = await axios.get(url, {
-        headers: {
-          Accept: 'text/csv',
-        },
-      });
-
-      const blob = new Blob([result.data], { type: 'text/csv;charset=utf-8;' });
-
-      const link = document.createElement('a');
-      if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', filename);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      const data = await handleDownload(url, filename);
 
       const newState = {
         loading: false,
-        data: result.data,
+        data,
         error: undefined,
       };
 
@@ -64,7 +76,6 @@ const useDownload: DownloadHook<any> = (
       };
 
       setState(newState);
-
       return newState;
     }
   };

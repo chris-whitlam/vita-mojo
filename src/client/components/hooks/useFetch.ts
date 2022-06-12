@@ -20,13 +20,13 @@ const useFetch: FetchHook<any> = ({
   });
 
   const callback = async (options: FetchHookCallbackOptions = {}) => {
-    try {
-      setState({
-        loading: true,
-        data: undefined,
-        error: undefined,
-      });
+    setState({
+      loading: true,
+      data: undefined,
+      error: undefined,
+    });
 
+    try {
       const result = await axios.get(url, {
         params: { ...queryParams, ...options?.queryParams },
         headers,

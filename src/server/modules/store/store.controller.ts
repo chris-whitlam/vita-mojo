@@ -29,7 +29,7 @@ export class StoreController {
   @Get('export')
   async export(@Res() res) {
     console.log('Exporting stores');
-    let dataPointCounter = 1;
+    let recordCounter = 0;
     const stringifier = stringify({ header: true });
 
     const stream = await this.storeService.streamAll();
@@ -40,11 +40,10 @@ export class StoreController {
     });
 
     stringifier.on('data', () => {
-      if (dataPointCounter % 100000 == 0) {
-        console.log(`Processed ${dataPointCounter} data points`);
+      recordCounter += 1;
+      if (recordCounter % 100000 == 0) {
+        console.log(`Processed ${recordCounter} records`);
       }
-
-      dataPointCounter += 1;
     });
 
     stringifier.on('error', (error) => {
@@ -54,7 +53,7 @@ export class StoreController {
     });
 
     stringifier.on('finish', () => {
-      console.log(`Export complete`);
+      console.log(`Export complete, processed ${recordCounter - 1} records`);
       res.status(200).end();
     });
 
