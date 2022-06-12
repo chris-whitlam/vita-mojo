@@ -3,6 +3,12 @@ import { Button, Space, DatePicker, Row, Col, Select } from 'antd';
 import styled from 'styled-components';
 import TextInput from './TextInput';
 
+export interface Filters {
+  searchQuery?: string;
+  lat?: number;
+  lng?: number;
+}
+
 const { RangePicker } = DatePicker;
 const { Option } = Select;
 
@@ -13,7 +19,15 @@ const StyledSpace = styled(Space)`
 
 export default function ({ setFilters }) {
   function findByLocation() {
-    alert('TODO: Search for stores by current user location');
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+
+      setFilters((filters) => ({
+        ...filters,
+        lat: latitude,
+        lng: longitude
+      }));
+    });
   }
 
   function onTimeRangeSubmit([startDate, endDate]: [

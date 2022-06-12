@@ -4,7 +4,7 @@ import { Layout, Avatar, Row, Col, Typography } from 'antd';
 
 import 'antd/dist/antd.compact.css';
 import StoreList from './StoreList';
-import Filters from './Filters';
+import Filters, { Filters as FiltersType } from './Filters';
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -34,7 +34,7 @@ const StyledTitle = styled(Title)`
 `;
 
 export default function () {
-  const [filters, setFilters] = useState({})
+  const [filters, setFilters] = useState<FiltersType>({})
 
   return (
     <Layout>

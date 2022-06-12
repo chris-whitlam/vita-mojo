@@ -26,7 +26,7 @@ export class StoreService {
   getList({
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
-    searchQuery,
+    searchQuery = '',
     lat,
     lng,
     startHour,
@@ -34,14 +34,28 @@ export class StoreService {
   }: StoreFilterOptionsDTO): Promise<Store[]> {
     // TODO: Get hours working, sort by distance if lat and long provided otherwiser use sortOrder field from stores table
     // assert lat and long both provided
-    return this.storeRepository.find({
-      take: limit,
-      skip: offset,
-      where: {
-        ...(searchQuery && { name: Like(`%${searchQuery}%`) }),
-        ...(lat && { lat }),
-        ...(lng && { long: lng }),
-      },
-    });
+
+    const hasCoordinates = lat != undefined && lng != undefined;
+
+    const query = this.storeRepository
+      .createQueryBuilder('store')
+      .where('store.name like :name', { name: `%${searchQuery}%` })
+      .offset(offset)
+      .limit(limit);
+
+    if (hasCoordinates) {
+      query.addSelect(
+        `ST_Distance_Sphere(
+            point(${lng}, ${lat}),
+            point(store.long, store.lat)
+          )`,
+        'distance',
+      );
+      query.orderBy({ distance: 'ASC' });
+    } else {
+      query.orderBy({ sort_order: 'ASC' });
+    }
+
+    return query.getMany();
   }
 }

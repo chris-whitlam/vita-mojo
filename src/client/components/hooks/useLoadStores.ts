@@ -2,14 +2,11 @@ import { useEffect, useState, useCallback } from 'react';
 import useFetch from './useFetch';
 
 import { FetchHookCallback, FetchHookReturnValue } from './types';
+import { Filters } from '../Filters';
 
 interface StoresState {
   stores: any;
   hasMoreToLoad: boolean;
-}
-
-interface Filters {
-  searchQuery?: string;
 }
 
 type LoadStoresHook = (filters: Filters) => FetchHookReturnValue<StoresState>;
@@ -22,15 +19,15 @@ const useLoadStores: LoadStoresHook = (filters: Filters = {}) => {
   const [{ loading, error }, loadStores] = useFetch({
     url: '/api/stores',
     queryParams: {
-      offset,
       ...filters,
+      offset
     },
   });
 
   const loadMoreStores: FetchHookCallback<StoresState> =
     useCallback(async () => {
       const { data: newStores } = await loadStores({
-        queryParams: { offset, ...filters },
+        queryParams: { ...filters, offset },
       });
 
       setHasMoreToLoad(!!newStores.length);

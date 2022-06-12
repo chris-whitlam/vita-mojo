@@ -13,6 +13,7 @@
     "seed:run": "npm run build && ts-node ./node_modules/typeorm-seeding/dist/cli.js seed",
     "db:migrate": "npm run build && npx typeorm migration:run",
     "db:seed": "./seed.sh",
+    "db:open": "mysql -h 127.0.0.1 -u$DB_USER -p$DB_PASSWORD",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

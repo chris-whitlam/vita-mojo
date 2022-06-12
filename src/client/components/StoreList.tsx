@@ -13,7 +13,7 @@ const StyledSpace = styled(Space)`
 export default function ({ filters }) {
   const [{ data: { stores, hasMoreToLoad }, error }, loadMore] = useLoadStores(filters);
 
-  if (!stores?.length || error) {
+  if (error || !stores?.length) {
     return null;
   }
 
