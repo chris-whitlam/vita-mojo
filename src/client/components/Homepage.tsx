@@ -5,7 +5,7 @@ import { Layout, Avatar, Row, Col, Typography } from 'antd';
 import 'antd/dist/antd.compact.css';
 import StoreList from './StoreList';
 import Filters, { Filters as FiltersType } from './Filters';
-import useDownload from './hooks/useDownload';
+import DownloadButton from './DownloadButton';
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -37,10 +37,6 @@ const StyledTitle = styled(Title)`
 export default function () {
   const [filters, setFilters] = useState<FiltersType>({});
 
-  const [{ error, loading }, downloadStoresCsv] = useDownload('myStores.csv', {
-    url: '/api/stores/export',
-  });
-
   return (
     <Layout>
       <StyledHeader>
@@ -50,11 +46,7 @@ export default function () {
         <Row>
           <Col span={12}>
             <Filters setFilters={setFilters} />
-            {loading && <span>Downloading CSV...</span>}
-            {!loading && (
-              <button onClick={() => downloadStoresCsv()}>Download CSV</button>
-            )}
-            {error && <span>Something went wrong!</span>}
+            <DownloadButton url='/api/stores/export' filename='myStores.csv'>Download CSV</DownloadButton>
             <StyledTitle level={2}>Stores</StyledTitle>
             <StoreList filters={filters} />
           </Col>
@@ -69,6 +61,6 @@ export default function () {
           </Col>
         </Row>
       </Content>
-    </Layout>
+    </Layout >
   );
 }
