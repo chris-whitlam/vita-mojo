@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { Matches, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  Matches,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class StoreFilterOptionsDTO {
   @IsOptional()

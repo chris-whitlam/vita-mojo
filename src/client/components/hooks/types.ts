@@ -1,10 +1,12 @@
+import { AxiosRequestConfig } from 'axios';
+
 export interface FetchState<T> {
   loading: boolean;
   data: T;
   error: any;
 }
 
-export interface FetchOptions {
+export interface FetchOptions extends AxiosRequestConfig {
   url: string;
   queryParams?: any;
 }

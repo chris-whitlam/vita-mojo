@@ -8,7 +8,11 @@ import {
   FetchState,
 } from './types';
 
-const useFetch: FetchHook<any> = ({ url, queryParams }: FetchOptions) => {
+const useFetch: FetchHook<any> = ({
+  url,
+  queryParams,
+  headers,
+}: FetchOptions) => {
   const [state, setState] = useState<FetchState<any>>({
     loading: false,
     data: undefined,
@@ -25,6 +29,7 @@ const useFetch: FetchHook<any> = ({ url, queryParams }: FetchOptions) => {
 
       const result = await axios.get(url, {
         params: { ...queryParams, ...options?.queryParams },
+        headers,
         ...options,
       });
 

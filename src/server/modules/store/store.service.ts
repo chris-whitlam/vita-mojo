@@ -22,6 +22,10 @@ export class StoreService {
     });
   }
 
+  streamAll() {
+    return this.storeRepository.createQueryBuilder().stream();
+  }
+
   getList({
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
@@ -32,9 +36,6 @@ export class StoreService {
     startHour,
     endHour,
   }: StoreFilterOptionsDTO): Promise<Store[]> {
-    // TODO: Get hours working, sort by distance if lat and long provided otherwiser use sortOrder field from stores table
-    // assert lat and long both provided
-
     const hasCoordinates = lat != undefined && lng != undefined;
     const shouldFilterByHours =
       weekday != undefined && startHour != undefined && endHour != undefined;

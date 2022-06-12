@@ -1,7 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import useFetch from './useFetch';
 
-import { FetchHookCallback, FetchHookCallbackOptions, FetchHookReturnValue } from './types';
+import {
+  FetchHookCallback,
+  FetchHookCallbackOptions,
+  FetchHookReturnValue,
+} from './types';
 import { Filters } from '../Filters';
 
 interface StoresState {
@@ -20,12 +24,12 @@ const useLoadStores: LoadStoresHook = (filters: Filters = {}) => {
     url: '/api/stores',
     queryParams: {
       ...filters,
-      offset
+      offset,
     },
   });
 
-  const loadMoreStores: FetchHookCallback<StoresState> =
-    useCallback(async (options: FetchHookCallbackOptions = {}) => {
+  const loadMoreStores: FetchHookCallback<StoresState> = useCallback(
+    async (options: FetchHookCallbackOptions = {}) => {
       const { data: newStores } = await loadStores({
         queryParams: { ...filters, ...options?.queryParams },
       });
@@ -37,13 +41,15 @@ const useLoadStores: LoadStoresHook = (filters: Filters = {}) => {
       }
 
       return { loading, data: { stores, hasMoreToLoad }, error };
-    }, [offset, filters]);
+    },
+    [offset, filters],
+  );
 
   useEffect(() => {
     setOffset(0);
     setHasMoreToLoad(true);
     setStores([]);
-    loadMoreStores({ queryParams: { offset: 0 }});
+    loadMoreStores({ queryParams: { offset: 0 } });
   }, [filters]);
 
   const newState = { loading, data: { stores, hasMoreToLoad }, error };

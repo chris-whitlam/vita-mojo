@@ -1,8 +1,10 @@
+import { stringify } from 'csv-stringify';
 import {
   ClassSerializerInterceptor,
   Controller,
   Get,
   Query,
+  Res,
   UseInterceptors,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
@@ -24,11 +26,39 @@ export class StoreController {
     return plainToInstance(StoreTransformer, stores);
   }
 
-  /**
-   * this endpoint should export all stores from database as a csv file
-   * */
   @Get('export')
-  async export() {
-    // todo
+  async export(@Res() res) {
+    console.log('Exporting stores');
+    let dataPointCounter = 1;
+    const stringifier = stringify({ header: true });
+
+    const stream = await this.storeService.streamAll();
+
+    res.set({
+      'Content-Type': 'text/csv',
+      'Content-Disposition': `attachment; filename="stores.csv"`,
+    });
+
+    stringifier.on('data', () => {
+      if (dataPointCounter % 100000 == 0) {
+        console.log(`Processed ${dataPointCounter} data points`);
+      }
+
+      dataPointCounter += 1;
+    });
+
+    stringifier.on('error', (error) => {
+      console.error(`Failed to complete export: ${error}`);
+
+      res.status(500).end();
+    });
+
+    stringifier.on('finish', () => {
+      console.log(`Export complete`);
+      res.status(200).end();
+    });
+
+    stream.pipe(stringifier);
+    stringifier.pipe(res);
   }
 }
