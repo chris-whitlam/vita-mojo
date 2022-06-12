@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Store } from 'server/data/models';
+import { Store, StoreHours } from 'server/data/models';
 import { StoreRepository } from 'server/data/repositories';
-import { Like } from 'typeorm';
 import { StoreFilterOptionsDTO } from './storeFilterOptions.dto';
 
 const DEFAULT_OFFSET = 0;
@@ -27,6 +26,7 @@ export class StoreService {
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
     searchQuery = '',
+    weekday,
     lat,
     lng,
     startHour,
@@ -36,10 +36,13 @@ export class StoreService {
     // assert lat and long both provided
 
     const hasCoordinates = lat != undefined && lng != undefined;
+    const shouldFilterByHours =
+      weekday != undefined && startHour != undefined && endHour != undefined;
 
     const query = this.storeRepository
       .createQueryBuilder('store')
       .where('store.name like :name', { name: `%${searchQuery}%` })
+      .andWhere('status = 1')
       .offset(offset)
       .limit(limit);
 
@@ -54,6 +57,16 @@ export class StoreService {
       query.orderBy({ distance: 'ASC' });
     } else {
       query.orderBy({ sort_order: 'ASC' });
+    }
+
+    if (shouldFilterByHours) {
+      query
+        .leftJoin(StoreHours, 'sh', 'store.id = sh.store_id')
+        .andWhere('sh.weekday = :weekday', { weekday })
+        .andWhere('sh.from >= :startHour AND sh.to <= :endHour', {
+          startHour,
+          endHour,
+        });
     }
 
     return query.getMany();

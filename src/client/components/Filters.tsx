@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Button, Space, DatePicker, Row, Col, Select } from 'antd';
 import styled from 'styled-components';
 import TextInput from './TextInput';
@@ -7,6 +7,15 @@ export interface Filters {
   searchQuery?: string;
   lat?: number;
   lng?: number;
+  weekday?: number;
+  startHour?: string;
+  endHour?: string;
+}
+
+interface HourFilters {
+  startHour?: string;
+  endHour?: string;
+  weekday?: number;
 }
 
 const { RangePicker } = DatePicker;
@@ -18,6 +27,8 @@ const StyledSpace = styled(Space)`
 `;
 
 export default function ({ setFilters }) {
+  let hoursFilters = useRef<HourFilters>({});
+
   function findByLocation() {
     navigator.geolocation.getCurrentPosition((position) => {
       const { latitude, longitude } = position.coords;
@@ -30,20 +41,36 @@ export default function ({ setFilters }) {
     });
   }
 
-  function onTimeRangeSubmit([startDate, endDate]: [
+  function onTimeRangeSubmit([startHour, endHour]: [
     moment.Moment,
     moment.Moment,
   ]) {
-    if (startDate && endDate) {
-      alert(
-        `TODO: Search for store by active hours
-        from ${startDate.format('HH:mm')} to ${endDate.format('HH:mm')}`,
-      );
+    hoursFilters.current = {
+      ...hoursFilters.current,
+      startHour: startHour.format('HH:mm'),
+      endHour: endHour.format('HH:mm')
+    }
+
+    if (hoursFilters.current.startHour && hoursFilters.current.endHour && hoursFilters.current.weekday) {
+      setFilters((filters: Filters) => ({
+        ...filters,
+        ...hoursFilters.current
+      }));
     }
   }
 
-  function onWeekdayChange(value: number) {
-    alert(`TODO: Search for store by weekday ${value}`);
+  function onWeekdayChange(weekday: number) {
+    hoursFilters.current = {
+      ...hoursFilters.current,
+      weekday,
+    }
+
+    if (hoursFilters.current.startHour && hoursFilters.current.endHour && hoursFilters.current.weekday) {
+      setFilters((filters: Filters) => ({
+        ...filters,
+        ...hoursFilters.current
+      }));
+    }
   }
 
   const filterByStoreName = (storeName: string) => {
@@ -89,7 +116,6 @@ export default function ({ setFilters }) {
             </Select>
             <RangePicker
               format="HH:mm"
-              onChange={console.log}
               onOk={onTimeRangeSubmit}
               picker="time"
             />

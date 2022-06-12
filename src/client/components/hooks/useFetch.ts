@@ -1,7 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 
-import { FetchHook, FetchOptions, FetchState } from './types';
+import {
+  FetchHook,
+  FetchHookCallbackOptions,
+  FetchOptions,
+  FetchState,
+} from './types';
 
 const useFetch: FetchHook<any> = ({ url, queryParams }: FetchOptions) => {
   const [state, setState] = useState<FetchState<any>>({
@@ -10,7 +15,7 @@ const useFetch: FetchHook<any> = ({ url, queryParams }: FetchOptions) => {
     error: undefined,
   });
 
-  const callback = async () => {
+  const callback = async (options: FetchHookCallbackOptions = {}) => {
     try {
       setState({
         loading: true,
@@ -19,7 +24,8 @@ const useFetch: FetchHook<any> = ({ url, queryParams }: FetchOptions) => {
       });
 
       const result = await axios.get(url, {
-        params: { ...queryParams },
+        params: { ...queryParams, ...options?.queryParams },
+        ...options,
       });
 
       const newState = {

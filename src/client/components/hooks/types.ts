@@ -8,9 +8,10 @@ export interface FetchOptions {
   url: string;
   queryParams?: any;
 }
+export type FetchHookCallbackOptions = Omit<FetchOptions, 'url'>;
 
 export type FetchHookCallback<T> = (
-  options?: Omit<FetchOptions, 'url'>,
+  options?: FetchHookCallbackOptions,
 ) => Promise<FetchState<T>>;
 
 export type FetchHookReturnValue<T> = [
