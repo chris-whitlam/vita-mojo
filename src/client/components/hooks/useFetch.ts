@@ -3,14 +3,14 @@ import axios from 'axios';
 
 import { FetchHook, FetchOptions, FetchState } from './types';
 
-const useFetch: FetchHook<any> = ({ url, queryParams = {} }: FetchOptions) => {
+const useFetch: FetchHook<any> = ({ url, queryParams }: FetchOptions) => {
   const [state, setState] = useState<FetchState<any>>({
     loading: false,
     data: undefined,
     error: undefined,
   });
 
-  const callback = useCallback(async (options = {}) => {
+  const callback = async () => {
     try {
       setState({
         loading: true,
@@ -19,8 +19,7 @@ const useFetch: FetchHook<any> = ({ url, queryParams = {} }: FetchOptions) => {
       });
 
       const result = await axios.get(url, {
-        params: { queryParams, ...options?.queryParams },
-        ...options,
+        params: { ...queryParams },
       });
 
       const newState = {
@@ -45,7 +44,7 @@ const useFetch: FetchHook<any> = ({ url, queryParams = {} }: FetchOptions) => {
 
       return newState;
     }
-  }, []);
+  };
 
   return [state, callback];
 };

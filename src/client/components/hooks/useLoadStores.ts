@@ -1,14 +1,20 @@
 import { useEffect, useState, useCallback } from 'react';
 import useFetch from './useFetch';
 
-import { FetchHook, FetchHookCallback } from './types';
+import { FetchHookCallback, FetchHookReturnValue } from './types';
 
 interface StoresState {
   stores: any;
   hasMoreToLoad: boolean;
 }
 
-const useLoadStores: FetchHook<StoresState> = () => {
+interface Filters {
+  searchQuery?: string;
+}
+
+type LoadStoresHook = (filters: Filters) => FetchHookReturnValue<StoresState>;
+
+const useLoadStores: LoadStoresHook = (filters: Filters = {}) => {
   const [offset, setOffset] = useState(0);
   const [hasMoreToLoad, setHasMoreToLoad] = useState(true);
   const [stores, setStores] = useState([]);
@@ -17,13 +23,14 @@ const useLoadStores: FetchHook<StoresState> = () => {
     url: '/api/stores',
     queryParams: {
       offset,
+      ...filters,
     },
   });
 
   const loadMoreStores: FetchHookCallback<StoresState> =
     useCallback(async () => {
       const { data: newStores } = await loadStores({
-        queryParams: { offset, limit: 30 },
+        queryParams: { offset, ...filters },
       });
 
       setHasMoreToLoad(!!newStores.length);
@@ -31,13 +38,17 @@ const useLoadStores: FetchHook<StoresState> = () => {
       setStores((currentStores) => [...currentStores, ...newStores]);
 
       return { loading, data: { stores, hasMoreToLoad }, error };
-    }, [offset]);
+    }, [offset, filters]);
 
   useEffect(() => {
+    setOffset(0);
+    setHasMoreToLoad(true);
+    setStores([]);
     loadMoreStores();
-  }, []);
+  }, [filters]);
 
-  return [{ loading, data: { stores, hasMoreToLoad }, error }, loadMoreStores];
+  const newState = { loading, data: { stores, hasMoreToLoad }, error };
+  return [newState, loadMoreStores];
 };
 
 export default useLoadStores;

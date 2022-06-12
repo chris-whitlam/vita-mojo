@@ -21,7 +21,6 @@ export class StoreController {
     @Query() filterOptions: StoreFilterOptionsDTO,
   ): Promise<StoreTransformer[]> {
     const stores = await this.storeService.getList(filterOptions);
-
     return plainToInstance(StoreTransformer, stores);
   }
 

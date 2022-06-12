@@ -10,8 +10,8 @@ const StyledSpace = styled(Space)`
   width: 100%;
 `;
 
-export default function () {
-  const [{ data: { stores, hasMoreToLoad }, error }, loadMore] = useLoadStores();
+export default function ({ filters }) {
+  const [{ data: { stores, hasMoreToLoad }, error }, loadMore] = useLoadStores(filters);
 
   if (!stores?.length || error) {
     return null;

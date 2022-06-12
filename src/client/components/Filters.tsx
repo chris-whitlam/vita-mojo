@@ -11,7 +11,7 @@ const StyledSpace = styled(Space)`
   align-items: center;
 `;
 
-export default function () {
+export default function ({ setFilters }) {
   function findByLocation() {
     alert('TODO: Search for stores by current user location');
   }
@@ -32,6 +32,13 @@ export default function () {
     alert(`TODO: Search for store by weekday ${value}`);
   }
 
+  const filterByStoreName = (storeName: string) => {
+    setFilters((filters) => ({
+      ...filters,
+      searchQuery: storeName,
+    }));
+  };
+
   return (
     <>
       <StyledSpace direction="vertical">
@@ -47,7 +54,10 @@ export default function () {
         <Row>
           <Col>
             <Space direction="horizontal">
-              <TextInput label="Filter stores by name" />
+              <TextInput
+                label="Filter stores by name"
+                onPressEnter={filterByStoreName}
+              />
             </Space>
           </Col>
         </Row>

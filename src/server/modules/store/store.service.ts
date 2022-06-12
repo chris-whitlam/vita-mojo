@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Store } from 'server/data/models';
 import { StoreRepository } from 'server/data/repositories';
+import { Like } from 'typeorm';
 import { StoreFilterOptionsDTO } from './storeFilterOptions.dto';
 
 const DEFAULT_OFFSET = 0;
@@ -33,12 +34,11 @@ export class StoreService {
   }: StoreFilterOptionsDTO): Promise<Store[]> {
     // TODO: Get hours working, sort by distance if lat and long provided otherwiser use sortOrder field from stores table
     // assert lat and long both provided
-
     return this.storeRepository.find({
       take: limit,
       skip: offset,
       where: {
-        ...(searchQuery && { name: searchQuery }),
+        ...(searchQuery && { name: Like(`%${searchQuery}%`) }),
         ...(lat && { lat }),
         ...(lng && { long: lng }),
       },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Layout, Avatar, Row, Col, Typography } from 'antd';
 
@@ -34,7 +34,7 @@ const StyledTitle = styled(Title)`
 `;
 
 export default function () {
-
+  const [filters, setFilters] = useState({})
 
   return (
     <Layout>
@@ -44,9 +44,9 @@ export default function () {
       <Content>
         <Row>
           <Col span={12}>
-            <Filters />
+            <Filters setFilters={setFilters} />
             <StyledTitle level={2}>Stores</StyledTitle>
-            <StoreList />
+            <StoreList filters={filters} />
           </Col>
           <Col span={12}>
             <BgImage>

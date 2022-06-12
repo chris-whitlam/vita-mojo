@@ -6,13 +6,17 @@ export interface FetchState<T> {
 
 export interface FetchOptions {
   url: string;
-  queryParams: any;
+  queryParams?: any;
 }
 
 export type FetchHookCallback<T> = (
   options?: Omit<FetchOptions, 'url'>,
 ) => Promise<FetchState<T>>;
 
-export type FetchHookReturnValue<T> = [FetchState<T>, FetchHookCallback<T>];
+export type FetchHookReturnValue<T> = [
+  FetchState<T>,
+  FetchHookCallback<T>,
+  ...any
+];
 
 export type FetchHook<T> = (options?: FetchOptions) => FetchHookReturnValue<T>;
